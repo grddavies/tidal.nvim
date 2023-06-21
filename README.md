@@ -61,7 +61,8 @@ opts = {
     send_line = { mode = { "i", "n" }, key = "<S-CR>" },
     send_visual = { mode = { "x" }, key = "<S-CR>" },
     send_block = { mode = { "i", "n", "x" }, key = "<M-CR>" },
-    send_node = { mode = "n", key = "<Leader><CR>" },
+    send_node = { mode = "n", key = "<leader><CR>" },
+    send_silence = { mode = "n", key = "<leader>d" },
     send_hush = { mode = "n", key = "<leader><Esc>" },
   },
   ---- Configure highlight applied to selections sent to tidal interpreter
@@ -107,6 +108,8 @@ which are used to send chunks of TidalCycles code from the file to the Tidal int
 - `send_node` sends the expression under the cursor
 
 - `send_visual` sends the current visual selection
+
+- `send_silence` accepts a count (see :h count) sends `d<count> silence` to tidal, silencing the pattern. By default, with no count, d1 is silenced.
 
 - `hush` sends "hush"
 

@@ -12,6 +12,7 @@ local keymaps = {
   },
   send_block = { callback = api.send_block, desc = "Send current block to tidal" },
   send_node = { callback = api.send_node, desc = "Send current TS node to tidal" },
+  send_silence = { callback = api.send_silence, desc = "Send 'd{count} silence' to tidal" },
   send_hush = {
     callback = function()
       api.send("hush")
