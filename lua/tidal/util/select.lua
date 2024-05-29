@@ -116,6 +116,13 @@ function M.get_block()
   }
 end
 
+local expression_nodes = {
+  "top_splice",
+  "exp",
+  "bind",
+  "function",
+}
+
 --- Get top level TS node at current position
 ---@return TextRange | nil
 function M.get_node()
@@ -132,9 +139,8 @@ function M.get_node()
     parent = node:parent()
   end
   while node ~= nil and not node:equal(root) do
-    local t = node:type()
-    --- We break at top level statements and function definitions
-    if t == "top_splice" or t == "function" then
+    local node_t = node:type()
+    if vim.list_contains(expression_nodes, node_t) then
       break
     end
     node = parent
