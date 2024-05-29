@@ -4,11 +4,13 @@ tidal.nvim is (another) Neovim plugin for livecoding with [TidalCycles](https://
 
 ## Features
 
-- User commands to start/stop ghci and (optionally) SuperCollider processes in Neovim's built in terminal (see [boot](#boot))
+- User commands to start/stop ghci and (optionally) SuperCollider processes in
+  Neovim's built in terminal (see [boot](#boot))
 
 - Send commands to the tidal interpreter using built-in [keymaps](#keymaps)
 
-- Write your own keymaps and functions using lua functions exported as part of the tidal.nvim [api](#api)
+- Write your own keymaps and functions using lua functions exported as part of
+  the tidal.nvim [api](#api)
 
 - Apply haskell syntax highlighting to .tidal files
 
@@ -83,10 +85,12 @@ opts = {
 `tidal.nvim` provides a pair of `Ex` commands,
 `:TidalLaunch` and `:TidalQuit`,
 which start and stop TidalCycles processes.
-By default, only a session of `ghci` running the `BootTidal.hs` script provided by this plugin is run.
+By default, only a session of `ghci` running the `BootTidal.hs` script provided
+by this plugin is run.
 
 If `boot.sclang.enabled` is `true`, then a session of `sclang` is run.
-Please ensure that the command `sclang` correctly starts an instance of SuperCollider when executed in the terminal.
+Please ensure that the command `sclang` correctly starts an instance of
+SuperCollider when executed in the terminal.
 By default on macOS, this appears to require something like the following
 shell script saved as `sclang` someplace in your path.
 
@@ -109,7 +113,8 @@ which are used to send chunks of TidalCycles code from the file to the Tidal int
 
 - `send_visual` sends the current visual selection
 
-- `send_silence` accepts a count (see :h count) sends `d<count> silence` to tidal, silencing the pattern. By default, with no count, d1 is silenced.
+- `send_silence` accepts a count (see :h count) sends `d<count> silence` to
+  tidal, silencing the pattern. By default, with no count, d1 is silenced.
 
 - `hush` sends "hush"
 
@@ -148,18 +153,27 @@ See the [tidal website for full details](https://tidalcycles.org/docs/getting-st
 
 - SuperCollider with SuperDirt
 
-### NeoVim
+### Neovim
 
-To use the `send_node` mapping, which is based on [treesitter](https://github.com/nvim-treesitter/nvim-treesitter), you must have the treesitter parser for `haskell` installed.
+To use the `send_node` mapping, which is based on
+[treesitter](https://github.com/nvim-treesitter/nvim-treesitter), you must have
+the treesitter parser for `haskell` installed.
 
 ## Contributing
 
-Contributions to the Neovim Tidalcycles Plugin are welcome! If you have ideas, bug fixes, or enhancements, please submit them as issues or pull requests
+Contributions to the Neovim Tidalcycles Plugin are welcome! If you have ideas,
+bug fixes, or enhancements, please submit them as issues or pull requests
 
-## Acknowledgements
+## Related projects
 
-- [vim.tidal](https://github.com/tidalcycles/vim-tidal)
+- [ryleelyman/tidal.nvim](https://github.com/ryleelyman/tidal.nvim) - Original
+  fork of this project
 
-- [vscode-tidalcycles](https://github.com/tidalcycles/vscode-tidalcycles)
+- [vim.tidal](https://github.com/tidalcycles/vim-tidal) - Vim plugin
+  for tidalcycles
 
-- [iron.nvim](https://github.com/Vigemus/iron.nvim)
+- [vscode-tidalcycles](https://github.com/tidalcycles/vscode-tidalcycles) -
+  VSCode plugin for tidalcycles
+
+- [iron.nvim](https://github.com/Vigemus/iron.nvim) - Neovim plugin for sending
+  code to various REPLs
