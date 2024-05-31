@@ -2,9 +2,15 @@
 
 tidal.nvim is (another) Neovim plugin for livecoding with [TidalCycles](https://tidalcycles.org)
 
+## Breaking Changes
+
+> [!IMPORTANT]  
+> This plugin is in an experimental state, and breaking changes may occur until
+> an initial version is released.
+
 ## Features
 
-- User commands to start/stop ghci and (optionally) SuperCollider processes in
+- Use Ex commands to start/stop ghci and (optionally) SuperCollider processes in
   Neovim's built in terminal (see [boot](#boot))
 
 - Send commands to the tidal interpreter using built-in [keymaps](#keymaps)
@@ -12,7 +18,8 @@ tidal.nvim is (another) Neovim plugin for livecoding with [TidalCycles](https://
 - Write your own keymaps and functions using lua functions exported as part of
   the tidal.nvim [api](#api)
 
-- Apply haskell syntax highlighting to .tidal files
+- Use filetype `tidal` for `*.tidal` files
+  - treesitter parsing using the haskell treesitter parser is automatically enabled
 
 ## Installation
 
@@ -128,7 +135,7 @@ vim.api.nvim_create_user_command("InstantGabber", function()
   local tidal = require("tidal")
   --- Send a message to tidal
   tidal.api.send("setcps (200/60/4)")
-  --- Send a multiline message to tidal
+  --- Send a multi-line message to tidal
   local drums = {
     "d1 $ stack [",
     's "gabba*4" # speed 0.78,',
