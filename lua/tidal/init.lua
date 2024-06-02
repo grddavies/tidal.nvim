@@ -34,7 +34,11 @@ local function setup_autocmds()
     group = "Tidal",
     pattern = { "*.tidal" },
     callback = function()
-      vim.api.nvim_buf_set_option(0, "filetype", "tidal")
+      -- Filetype setup
+      vim.bo.comments = vim.filetype.get_option("haskell", "comments")
+      vim.bo.commentstring = vim.filetype.get_option("haskell", "commentstring")
+
+      -- Register Keymaps
       for name, mapping in pairs(config.options.mappings or {}) do
         if mapping then
           local command = keymaps[name]
@@ -48,7 +52,9 @@ end
 ---Configure Tidal plugin
 ---@param options TidalConfig | nil
 function Tidal.setup(options)
+  vim.filetype.add({ extension = { tidal = "tidal" } })
   vim.treesitter.language.register("haskell", { "tidal" })
+
   -- TODO: Check version support
   if vim.fn.has("nvim-0.8.0") == 0 then
     notify.error("Tidal requires nvim >= 0.8.0")
