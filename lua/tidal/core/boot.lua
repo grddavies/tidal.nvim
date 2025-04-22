@@ -1,4 +1,5 @@
 local state = require("tidal.core.state")
+local scd = require("tidal.util.scd")
 
 local M = {}
 
@@ -53,7 +54,7 @@ function M.sclang(args)
     return
   end
 
-  state.sclang.proc = vim.fn.termopen(args.cmd .. " " .. args.file, {
+  state.sclang.proc = vim.fn.termopen(args.cmd, {
     on_exit = function()
       if state.sclang.buf ~= nil and #vim.fn.win_findbuf(state.sclang.buf) > 0 then
         vim.api.nvim_win_close(vim.fn.win_findbuf(state.sclang.buf)[1], true)
@@ -63,6 +64,16 @@ function M.sclang(args)
       state.sclang.proc = nil
     end,
   })
+
+  local lines;
+  if scd.file_exists(args.glob) then
+    lines = scd.lines_from(args.glob)
+  elseif scd.file_exists(args.file) then
+    lines = scd.lines_from(args.file)
+  else
+    return
+  end
+  vim.api.nvim_chan_send(state.sclang.proc, scd.scd_concat(lines) .. "\n")
 end
 
 return M
