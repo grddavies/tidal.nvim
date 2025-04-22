@@ -1,32 +1,31 @@
-local state = require("tidal.core.state")
 local select = require("tidal.util.select")
 local notify = require("tidal.util.notify")
+local scd = require("tidal.util.scd")
 
 local M = {}
 
 --- Send a command to the tidal interpreter
 ---@param text string
 function M.send(text)
-  local buf = vim.api.nvim_get_current_buf()
-  local ftype = vim.api.nvim_get_option_value('filetype', { buf = buf })
+  local _, proc = scd.filetype()
 
-  if ftype == 'haskell' then
-    if not state.ghci.proc then
-      return
-    end
-    vim.api.nvim_chan_send(state.ghci.proc, text .. "\n")
-  elseif ftype == 'supercollider' then
-    if not state.sclang.proc then
-      return
-    end
-    vim.api.nvim_chan_send(state.sclang.proc, text .. "\n")
+  if not proc then
+    return
   end
+
+  vim.api.nvim_chan_send(proc, text .. "\n")
 end
 
 --- Send a multiline command to the tidal interpreter
 ---@param lines string[]
 function M.send_multiline(lines)
-  M.send(":{\n" .. table.concat(lines, "\n") .. "\n:}")
+  local ftype, _ =  scd.filetype()
+
+  if ftype == 'haskell' then
+    M.send(":{\n" .. table.concat(lines, "\n") .. "\n:}")
+  elseif ftype == 'supercollider' then
+    M.send(scd.scd_concat(lines))
+  end
 end
 
 --- Send a text contained in a motion to the tidal interpreter
