@@ -34,7 +34,22 @@ local function setup_autocmds()
     group = "Tidal",
     pattern = { "*.tidal" },
     callback = function()
-      vim.api.nvim_buf_set_option(0, "filetype", "haskell")
+      local buf = vim.api.nvim_get_current_buf()
+      vim.api.nvim_set_option_value('filetype', 'haskell', { buf = buf })
+      for name, mapping in pairs(config.options.mappings or {}) do
+        if mapping then
+          local command = keymaps[name]
+          vim.keymap.set(mapping.mode, mapping.key, command.callback, { buffer = true, desc = command.desc })
+        end
+      end
+    end,
+  })
+  vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+    group = "Tidal",
+    pattern = { "*.scd" },
+    callback = function()
+      local buf = vim.api.nvim_get_current_buf()
+      vim.api.nvim_set_option_value('filetype', 'supercollider', { buf = buf })
       for name, mapping in pairs(config.options.mappings or {}) do
         if mapping then
           local command = keymaps[name]

@@ -7,10 +7,20 @@ local M = {}
 --- Send a command to the tidal interpreter
 ---@param text string
 function M.send(text)
-  if not state.ghci.proc then
-    return
+  local buf = vim.api.nvim_get_current_buf()
+  local ftype = vim.api.nvim_get_option_value('filetype', { buf = buf })
+
+  if ftype == 'haskell' then
+    if not state.ghci.proc then
+      return
+    end
+    vim.api.nvim_chan_send(state.ghci.proc, text .. "\n")
+  elseif ftype == 'supercollider' then
+    if not state.sclang.proc then
+      return
+    end
+    vim.api.nvim_chan_send(state.sclang.proc, text .. "\n")
   end
-  vim.api.nvim_chan_send(state.ghci.proc, text .. "\n")
 end
 
 --- Send a multiline command to the tidal interpreter
