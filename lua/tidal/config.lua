@@ -8,6 +8,7 @@ local M = {}
 ---@class TidalProcConfig
 ---@field cmd string
 ---@field file string
+---@field glob string
 ---@field args table<string>
 ---@field enabled boolean
 
@@ -30,6 +31,7 @@ local defaults = {
       cmd = "sclang",
       args = {},
       --- SuperCollider boot file
+      glob = 'BootSuperDirt.scd',
       file = vim.api.nvim_get_runtime_file("bootfiles/BootSuperDirt.scd", false)[1],
       enabled = false,
     },
