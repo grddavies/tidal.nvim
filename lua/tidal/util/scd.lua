@@ -34,24 +34,29 @@ function M.scd_concat(lines)
   for k,v in pairs(lines) do
     lines[k] = v:gsub('//.*$', '')
   end
-  return table.concat(lines, " "):gsub('/%*.-%*/', '')[1]
+  return table.concat(lines, " "):gsub('/%*.-%*/', '')
 end
 
 --- return the current filetype and matching repl's proc
+--- @param repl "tc" | "sc" | nil
 --- @return string,any
-function M.filetype()
-  local buf = vim.api.nvim_get_current_buf()
-  local ftype = vim.api.nvim_get_option_value('filetype', { buf = buf })
+function M.filetype(repl)
   local proc
 
-  if ftype == 'haskell' then
-    proc = state.ghci.proc
-  elseif ftype == 'supercollider' then
-    proc = state.sclang.proc
+  if not repl then
+    local buf = vim.api.nvim_get_current_buf()
+    repl = vim.api.nvim_get_option_value('filetype', { buf = buf })
   end
 
-  return ftype, proc
+  if repl == 'haskell' or repl == 'tc' then
+    proc = state.ghci.proc
+    repl = 'tc'
+  elseif repl == 'supercollider' or repl == 'sc' then
+    proc = state.sclang.proc
+    repl = 'sc'
+  end
 
+  return repl, proc
 end
 
 return M

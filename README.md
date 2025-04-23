@@ -127,7 +127,8 @@ which are used to send chunks of TidalCycles code from the file to the Tidal int
 vim.api.nvim_create_user_command("InstantGabber", function()
   local tidal = require("tidal")
   --- Send a message to tidal
-  tidal.api.send("setcps (200/60/4)")
+  --- second parameter 'tc' to send to tidal cycles repl, 'sc' for SuperCollider repl
+  tidal.api.send("setcps (200/60/4)", 'tc')
   --- Send a multiline message to tidal
   local drums = {
     "d1 $ stack [",
@@ -135,9 +136,9 @@ vim.api.nvim_create_user_command("InstantGabber", function()
     's "<[~ sd:2]*4!3 [sd*4 [~ sd]!3]>",',
     's "~ hh:2*4"]',
   }
-  tidal.api.send_multiline(drums)
-  tidal.api.send('d2 $ "amencutup*8" # irand 32 # crush 4 # speed (5/4)')
-  tidal.api.send('d3 $ s "rave" + speed "[3 2 3 2] [4 3 4 2]" # end (slow 2 (tri * 0.7))')
+  tidal.api.send_multiline(drums, 'tc')
+  tidal.api.send('d2 $ "amencutup*8" # irand 32 # crush 4 # speed (5/4)', 'tc')
+  tidal.api.send('d3 $ s "rave" + speed "[3 2 3 2] [4 3 4 2]" # end (slow 2 (tri * 0.7))', 'tc')
 end, { desc = "Make gabber happen fast" })
 ```
 

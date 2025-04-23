@@ -5,9 +5,10 @@ local scd = require("tidal.util.scd")
 local M = {}
 
 --- Send a command to the tidal interpreter
----@param text string
-function M.send(text)
-  local _, proc = scd.filetype()
+--- @param text string
+--- @param repl "tc" | "sc" | nil
+function M.send(text, --[[optional]]repl)
+  local _, proc = scd.filetype(repl)
 
   if not proc then
     return
@@ -17,14 +18,15 @@ function M.send(text)
 end
 
 --- Send a multiline command to the tidal interpreter
----@param lines string[]
-function M.send_multiline(lines)
-  local ftype, _ =  scd.filetype()
+--- @param lines string[]
+--- @param repl "tc" | "sc" | nil
+function M.send_multiline(lines, --[[optional]]repl)
+  local ftype, _ =  scd.filetype(repl)
 
-  if ftype == 'haskell' then
-    M.send(":{\n" .. table.concat(lines, "\n") .. "\n:}")
-  elseif ftype == 'supercollider' then
-    M.send(scd.scd_concat(lines))
+  if ftype == 'tc' then
+    M.send(":{\n" .. table.concat(lines, "\n") .. "\n:}", repl)
+  elseif ftype == 'sc' then
+    M.send(scd.scd_concat(lines), repl)
   end
 end
 
