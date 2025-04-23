@@ -34,7 +34,7 @@ function M.scd_concat(lines)
   for k,v in pairs(lines) do
     lines[k] = v:gsub('//.*$', '')
   end
-  return table.concat(lines, " "):gsub('/%*.*%*/', '')[1]
+  return table.concat(lines, " "):gsub('/%*.-%*/', '')[1]
 end
 
 --- return the current filetype and matching repl's proc
