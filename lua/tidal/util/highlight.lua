@@ -6,21 +6,9 @@ local M = {}
 
 local api = vim.api
 
----@type string | table<string, any>
-local style = {}
-if type(hl_opts.highlight) == "string" then
-  style = api.nvim_get_hl(0, { name = hl_opts.highlight })
-elseif type(hl_opts.highlight) == "table" then
-  style = hl_opts.highlight
-end
----@cast style table<string, any>
 local higroup = "TidalSent"
-api.nvim_set_hl_ns(ns)
-api.nvim_set_hl(ns, higroup, style)
 
-local timeout = hl_opts.timeout
-
-local hl_timer
+api.nvim_set_hl(0, higroup, hl_opts.highlight)
 
 --- Apply a transient highlight to a range in the current buffer
 ---@param start { [1]: integer, [2]: integer } Start position {line, col}
@@ -28,26 +16,20 @@ local hl_timer
 function M.apply_highlight(start, finish)
   local event = vim.v.event
   local bufnr = api.nvim_get_current_buf()
-  api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-  if hl_timer then
-    hl_timer:close()
+
+  vim.hl.range(bufnr, ns, higroup, start, finish, {
+    regtype = event.regtype or "v",
+    inclusive = event.inclusive,
+    priority = vim.hl.priorities.user,
+    timeout = hl_opts.timeout,
+  })
+end
+
+--- Clear tidal.nvim highlights in all buffers
+function M.clear_all()
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
   end
-
-  vim.highlight.range(
-    bufnr,
-    ns,
-    higroup,
-    start,
-    finish,
-    { regtype = event.regtype, inclusive = event.inclusive, priority = vim.highlight.priorities.user }
-  )
-
-  hl_timer = vim.defer_fn(function()
-    hl_timer = nil
-    if api.nvim_buf_is_valid(bufnr) then
-      api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-    end
-  end, timeout)
 end
 
 return M

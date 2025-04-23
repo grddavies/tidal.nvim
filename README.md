@@ -69,9 +69,10 @@ opts = {
   },
   ---- Configure highlight applied to selections sent to tidal interpreter
   selection_highlight = {
-    --- Can be either the name of a highlight group or a highlight definition table
+    --- Highlight definition table
     --- see ':h nvim_set_hl' for details
-    highlight = "IncSearch",
+    --- @type vim.api.keyset.highlight
+    highlight = { link = "IncSearch" },
     --- Duration to apply the highlight for
     timeout = 150,
   },
