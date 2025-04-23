@@ -34,7 +34,7 @@ local function setup_autocmds()
     group = "Tidal",
     pattern = { "*.tidal" },
     callback = function()
-      vim.api.nvim_buf_set_option(0, "filetype", "haskell")
+      vim.api.nvim_set_option_value("filetype", "haskell", { buf = 0 })
       for name, mapping in pairs(config.options.mappings or {}) do
         if mapping then
           local command = keymaps[name]
@@ -45,12 +45,13 @@ local function setup_autocmds()
   })
 end
 
+local MIN_VERSION = "0.8.0"
+
 ---Configure Tidal plugin
 ---@param options TidalConfig | nil
 function Tidal.setup(options)
-  -- TODO: Check version support
-  if vim.fn.has("nvim-0.8.0") == 0 then
-    notify.error("Tidal requires nvim >= 0.8.0")
+  if vim.fn.has("nvim-" .. MIN_VERSION) == 0 then
+    notify.error("tidal.nvim requires nvim >= " .. MIN_VERSION)
     return
   end
 

@@ -4,7 +4,7 @@ local notify = require("tidal.util.notify")
 
 local M = {}
 
---- Send a command to the tidal interpreter
+--- Send text to the tidal interpreter
 ---@param text string
 function M.send(text)
   if not state.ghci.proc then

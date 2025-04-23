@@ -20,9 +20,10 @@ function M.tidal(args)
     M.tidal(args)
     return
   end
-  state.ghci.proc = vim.fn.termopen(
+  state.ghci.proc = vim.fn.jobstart(
     args.cmd .. " -XOverloadedStrings " .. table.concat(args.args, " ") .. " -ghci-script=" .. args.file,
     {
+      term = true,
       on_exit = function()
         if state.ghci.buf ~= nil and #vim.fn.win_findbuf(state.ghci.buf) > 0 then
           vim.api.nvim_win_close(vim.fn.win_findbuf(state.ghci.buf)[1], true)
@@ -53,7 +54,8 @@ function M.sclang(args)
     return
   end
 
-  state.sclang.proc = vim.fn.termopen(args.cmd .. " " .. args.file, {
+  state.sclang.proc = vim.fn.jobstart(args.cmd .. " " .. args.file, {
+    term = true,
     on_exit = function()
       if state.sclang.buf ~= nil and #vim.fn.win_findbuf(state.sclang.buf) > 0 then
         vim.api.nvim_win_close(vim.fn.win_findbuf(state.sclang.buf)[1], true)
