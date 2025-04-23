@@ -1,3 +1,4 @@
+local message = require("tidal.core.message")
 local state = require("tidal.core.state")
 local scd = require("tidal.util.scd")
 
@@ -73,7 +74,7 @@ function M.sclang(args)
   else
     return
   end
-  vim.api.nvim_chan_send(state.sclang.proc, scd.scd_concat(lines) .. "\n")
+  message.send_multiline(lines, 'sc')
 end
 
 return M
