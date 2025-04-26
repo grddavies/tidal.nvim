@@ -55,6 +55,7 @@ function M.get_visual()
 
   -- block-wise visual
   -- return the lines encompassed by the selection, each truncated by the start and end columns
+  -- selene: allow(bad_string_escape) - see :h visualmode
   if mode == "\x16" then
     error("Blockwise visual selection not implemented", vim.log.levels.ERROR)
     -- local _, start_col = unpack(range.start)
