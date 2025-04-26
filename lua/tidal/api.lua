@@ -1,9 +1,9 @@
 local boot = require("tidal.core.boot")
 local message = require("tidal.core.message")
-local state = require("tidal.core.state")
-local util = require("tidal.util")
 local notify = require("tidal.util.notify")
 local select = require("tidal.util.select")
+local state = require("tidal.core.state")
+local util = require("tidal.util")
 -- Lazily require highlight module to ensure 'setup' is called before
 
 local M = {}

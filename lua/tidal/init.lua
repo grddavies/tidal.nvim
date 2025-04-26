@@ -1,6 +1,6 @@
+local api = require("tidal.api")
 local config = require("tidal.config")
 local notify = require("tidal.util.notify")
-local api = require("tidal.api")
 
 local Tidal = {}
 
