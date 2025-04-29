@@ -18,23 +18,17 @@ function M.launch_tidal(args)
     return
   end
   if args.tidal.enabled then
-    vim.cmd(args.split == "v" and "vsplit" or "split")
     boot.tidal(args.tidal)
+    state.ghci.buf:show({
+      split = args.split,
+    })
   end
   if args.sclang.enabled then
-    vim.cmd(args.split == "v" and "split" or "vsplit")
     boot.sclang(args.sclang)
-  end
-  -- Follow terminal output
-  if state.ghci.buf then
-    vim.api.nvim_buf_call(state.ghci.buf, function()
-      vim.cmd.normal("G")
-    end)
-  end
-  if state.sclang.buf then
-    vim.api.nvim_buf_call(state.sclang.buf, function()
-      vim.cmd.normal("G")
-    end)
+    state.sclang.buf:show({
+      -- Flip the second split orientation
+      split = args.split == "v" and "h" or "v",
+    })
   end
   vim.api.nvim_set_current_win(current_win)
   state.launched = true
@@ -46,51 +40,88 @@ function M.exit_tidal()
     notify.warn("Tidal is not running. Launch with ':TidalLaunch'")
     return
   end
-  if state.ghci.proc then
-    vim.fn.jobstop(state.ghci.proc)
+  --- FIXME: Doesn't stop proc
+  if state.ghci then
+    state.ghci.proc:stop()
+    state.ghci.buf:delete()
   end
-  if state.sclang.proc then
-    vim.fn.jobstop(state.sclang.proc)
+  if state.sclang then
+    state.sclang.proc:stop()
+    state.sclang.buf:delete()
   end
   state.launched = false
 end
 
-M.send = message.send
-
--- Send 'd{count} silence' to tidal interpreter to silence a pattern d1-d16
-M.send_silence = function()
-  message.send(string.format("d%d silence", vim.v.count1))
+local function ft_to_repl()
+  local ft = vim.api.nvim_get_option_value("filetype", { buf = 0 })
+  if ft == "haskell" or ft == "tidal" then
+    return message.tidal
+  end
+  if ft == "supercollider" then
+    return message.scd
+  end
+  return nil
 end
 
-M.send_multiline = message.send_multiline
+--- Send text to the interpreter for the current filetype
+--- @param text string
+function M.send(text)
+  local repl = ft_to_repl()
+  if repl then
+    repl.send_line(text)
+  end
+end
 
---- Send the current line to the tidal interpreter
-M.send_line = function()
+-- Send 'd{count} silence' to tidal interpreter to silence a pattern d1-d16
+function M.send_silence()
+  message.tidal.send(string.format("d%d silence", vim.v.count1))
+end
+
+--- Send multiline to the interpreter for the current filetype
+--- @param lines string[]
+function M.send_multiline(lines)
+  local repl = ft_to_repl()
+  if repl then
+    repl.send_multilined(lines)
+  end
+end
+
+--- Send the current line to the interpreter for the current filetype
+function M.send_line()
   local line = select.get_current_line()
   local text = line.lines[1]
   if #text > 0 then
     require("tidal.util.highlight").apply_highlight(line.start, line.finish)
-    M.send(text)
+    local repl = ft_to_repl()
+    if repl then
+      repl.send_line(text)
+    end
   end
 end
 
 --- Send the last visual selection to the tidal interpreter
-M.send_visual = function()
+function M.send_visual()
   local visual = select.get_visual()
   if visual then
     require("tidal.util.highlight").apply_highlight(visual.start, visual.finish)
-    message.send_multiline(visual.lines)
+    local repl = ft_to_repl()
+    if repl then
+      repl.send_multiline(visual.lines)
+    end
   end
 end
 
 --- Send the current block to tidal interpreter
-M.send_block = function()
+function M.send_block()
   if util.is_empty(vim.api.nvim_get_current_line()) then
     return
   end
   local block = select.get_block()
   require("tidal.util.highlight").apply_highlight(block.start, block.finish)
-  message.send_multiline(block.lines)
+  local repl = ft_to_repl()
+  if repl then
+    repl.send_multiline(block.lines)
+  end
 end
 
 --- Send current TS block to tidal interpreter
@@ -98,7 +129,10 @@ function M.send_node()
   local block = select.get_node()
   if block then
     require("tidal.util.highlight").apply_highlight(block.start, block.finish)
-    message.send_multiline(block.lines)
+    local repl = ft_to_repl()
+    if repl then
+      repl.send_multiline(block.lines)
+    end
   end
 end
 

@@ -1,5 +1,6 @@
 local api = require("tidal.api")
 local config = require("tidal.config")
+local message = require("tidal.core.message")
 local notify = require("tidal.util.notify")
 
 local Tidal = {}
@@ -15,7 +16,7 @@ local keymaps = {
   send_silence = { callback = api.send_silence, desc = "Send 'd{count} silence' to tidal" },
   send_hush = {
     callback = function()
-      api.send("hush")
+      message.tidal.send_line("hush")
     end,
     desc = "Send 'hush' to tidal",
   },
@@ -35,6 +36,19 @@ local function setup_autocmds()
     pattern = { "*.tidal" },
     callback = function()
       vim.api.nvim_set_option_value("filetype", "haskell", { buf = 0 })
+      for name, mapping in pairs(config.options.mappings or {}) do
+        if mapping then
+          local command = keymaps[name]
+          vim.keymap.set(mapping.mode, mapping.key, command.callback, { buffer = true, desc = command.desc })
+        end
+      end
+    end,
+  })
+
+  vim.api.nvim_create_autocmd({ "Filetype" }, {
+    group = "Tidal",
+    pattern = { "supercollider" },
+    callback = function()
       for name, mapping in pairs(config.options.mappings or {}) do
         if mapping then
           local command = keymaps[name]
