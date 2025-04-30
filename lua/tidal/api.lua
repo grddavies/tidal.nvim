@@ -22,11 +22,8 @@ function M.launch_tidal(args)
     boot.tidal(args.tidal)
   end
   if args.sclang.enabled then
+    -- TODO: (config) Configurable split
     boot.sclang(args.sclang)
-    state.sclang.buf:show({
-      -- Flip the second split orientation
-      split = args.split == "v" and "h" or "v",
-    })
   end
   vim.api.nvim_set_current_win(current_win)
   state.launched = true
@@ -38,14 +35,13 @@ function M.exit_tidal()
     notify.warn("Tidal is not running. Launch with ':TidalLaunch'")
     return
   end
-  --- FIXME: Doesn't stop proc
-  if state.ghci then
-    state.ghci:exit()
+
+  for _, proc in ipairs({ state.ghci, state.sclang }) do
+    if proc then
+      proc:exit()
+    end
   end
-  if state.sclang then
-    state.sclang.proc:stop()
-    state.sclang.buf:delete()
-  end
+
   state.launched = false
 end
 

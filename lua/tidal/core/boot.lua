@@ -44,10 +44,12 @@ function M.sclang(opts)
     on_exit = function(_code, _signal)
       state.sclang = nil
     end,
+    window = {
+      split = "h",
+    },
   })
 
-  state.sclang.proc:start()
-
+  -- load the boot file
   local file = vim.fn.expand(opts.file)
   state.sclang:send_line('"' .. file .. '".load;')
 end

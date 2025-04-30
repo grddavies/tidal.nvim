@@ -1,9 +1,8 @@
 local Buffer = require("tidal.util.buffer")
-local Process = require("tidal.util.process")
 
 ---@class Sclang
 ---@field buf Buffer
----@field proc Process
+---@field proc integer
 
 local Sclang = {}
 Sclang.__index = Sclang
@@ -19,6 +18,7 @@ local keycodes = {
 ---@field args? table<string> additional arguments to for sclang
 ---@field name? string repl buffer name
 ---@field on_exit fun(code: number, signal: number)?
+---@field window? table
 
 --- Create a new sclang REPL
 --- @param opts? SclangOpts
@@ -30,10 +30,11 @@ function Sclang.new(opts)
     scratch = true,
     listed = false,
   })
-  self.proc = Process.new(opts.cmd, opts.args or {}, {
-    on_stdout = function(data)
-      self.buf:append(data)
-    end,
+
+  self.buf:show(opts.window)
+
+  self.proc = vim.fn.jobstart(vim.list_extend({ opts.cmd }, opts.args), {
+    term = true,
     on_exit = function(code, signal)
       self.buf:delete()
       if opts.on_exit then
@@ -46,8 +47,8 @@ end
 
 --- Send text to sclang
 function Sclang:send(text)
-  self.buf:append(text)
-  self.proc.stdin:write(text)
+  vim.api.nvim_chan_send(self.proc, text)
+  self.buf:scroll_to_bottom()
 end
 
 --- Send line of text to sclang and evaluate
@@ -60,6 +61,13 @@ end
 ---@param lines string[]
 function Sclang:send_multiline(lines)
   self:send_line(table.concat(lines, "\n"))
+end
+
+--- Close the REPL
+function Sclang:exit()
+  if self.proc then
+    vim.fn.jobstop(self.proc)
+  end
 end
 
 return Sclang

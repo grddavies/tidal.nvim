@@ -2,7 +2,7 @@ local Buffer = require("tidal.util.buffer")
 
 ---@class Ghci
 ---@field buf Buffer
----@field proc Process
+---@field proc integer
 
 local Ghci = {}
 Ghci.__index = Ghci
