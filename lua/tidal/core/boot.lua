@@ -21,9 +21,10 @@ function M.tidal(opts)
     on_exit = function(_code, _signal)
       state.ghci = nil
     end,
+    window = {
+      split = "v",
+    },
   })
-
-  state.ghci.proc:start()
 end
 
 ---Start an sclang instance

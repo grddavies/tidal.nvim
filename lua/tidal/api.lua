@@ -18,10 +18,8 @@ function M.launch_tidal(args)
     return
   end
   if args.tidal.enabled then
+    -- TODO: (config) Configurable split
     boot.tidal(args.tidal)
-    state.ghci.buf:show({
-      split = args.split,
-    })
   end
   if args.sclang.enabled then
     boot.sclang(args.sclang)
@@ -42,8 +40,7 @@ function M.exit_tidal()
   end
   --- FIXME: Doesn't stop proc
   if state.ghci then
-    state.ghci.proc:stop()
-    state.ghci.buf:delete()
+    state.ghci:exit()
   end
   if state.sclang then
     state.sclang.proc:stop()

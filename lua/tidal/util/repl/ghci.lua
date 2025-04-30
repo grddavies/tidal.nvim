@@ -1,5 +1,4 @@
 local Buffer = require("tidal.util.buffer")
-local Process = require("tidal.util.process")
 
 ---@class Ghci
 ---@field buf Buffer
@@ -13,6 +12,7 @@ Ghci.__index = Ghci
 ---@field args? table<string> additional arguments to for GHCi
 ---@field name? string repl buffer name
 ---@field on_exit fun(code: number, signal: number)?
+---@field window? table
 
 --- Create a new GHCi REPL
 --- @param opts? GhciOpts
@@ -24,17 +24,11 @@ function Ghci.new(opts)
     scratch = true,
     listed = false,
   })
-  self.buf:set_option("buftype", "nofile")
-  self.buf:set_option("swapfile", false)
-  self.buf:set_option("undolevels", -1)
 
-  self.proc = Process.new(opts.cmd, opts.args or {}, {
-    on_stdout = function(data)
-      self.buf:append(data)
-    end,
-    on_stderr = function(data)
-      self.buf:append(data)
-    end,
+  self.buf:show(opts.window)
+
+  self.proc = vim.fn.jobstart(vim.list_extend({ opts.cmd }, opts.args), {
+    term = true,
     on_exit = function(code, signal)
       self.buf:delete()
       if opts.on_exit then
@@ -45,22 +39,29 @@ function Ghci.new(opts)
   return self
 end
 
---- Send text to ghci
+--- Send text to GHCi
 function Ghci:send(text)
-  self.buf:append(text)
-  self.proc.stdin:write(text)
+  vim.api.nvim_chan_send(self.proc, text)
+  self.buf:scroll_to_bottom()
 end
 
---- Send line of text to ghci and evaluate
+--- Send line of text to GHCi
 ---@param text string
 function Ghci:send_line(text)
   self:send(text .. "\n")
 end
 
---- Send multiline text to ghci
+--- Send multi-line text to GHCi
 ---@param lines string[]
 function Ghci:send_multiline(lines)
   self:send_line(":{\n" .. table.concat(lines, "\n") .. "\n:}")
+end
+
+--- Close the REPL
+function Ghci:exit()
+  if self.proc then
+    vim.fn.jobstop(self.proc)
+  end
 end
 
 return Ghci
