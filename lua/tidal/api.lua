@@ -85,7 +85,7 @@ function M.send_line()
   local line = select.get_current_line()
   local text = line.lines[1]
   if #text > 0 then
-    require("tidal.util.highlight").apply_highlight(line.start, line.finish)
+    require("tidal.core.highlight").apply_highlight(line.start, line.finish)
     local repl = ft_to_repl()
     if repl then
       repl.send_line(text)
@@ -97,7 +97,7 @@ end
 function M.send_visual()
   local visual = select.get_visual()
   if visual then
-    require("tidal.util.highlight").apply_highlight(visual.start, visual.finish)
+    require("tidal.core.highlight").apply_highlight(visual.start, visual.finish)
     local repl = ft_to_repl()
     if repl then
       repl.send_multiline(visual.lines)
@@ -111,7 +111,7 @@ function M.send_block()
     return
   end
   local block = select.get_block()
-  require("tidal.util.highlight").apply_highlight(block.start, block.finish)
+  require("tidal.core.highlight").apply_highlight(block.start, block.finish)
   local repl = ft_to_repl()
   if repl then
     repl.send_multiline(block.lines)
@@ -122,7 +122,7 @@ end
 function M.send_node()
   local block = select.get_node()
   if block then
-    require("tidal.util.highlight").apply_highlight(block.start, block.finish)
+    require("tidal.core.highlight").apply_highlight(block.start, block.finish)
     local repl = ft_to_repl()
     if repl then
       repl.send_multiline(block.lines)
