@@ -47,13 +47,14 @@ end
 
 local function ft_to_repl()
   local ft = vim.api.nvim_get_option_value("filetype", { buf = 0 })
-  if ft == "haskell" or ft == "tidal" then
-    return message.tidal
-  end
   if ft == "supercollider" then
     return message.scd
   end
-  return nil
+  if ft == "haskell" or ft == "tidal" then
+    return message.tidal
+  end
+  -- default to tidal repl
+  return message.tidal
 end
 
 --- Send text to the interpreter for the current filetype
