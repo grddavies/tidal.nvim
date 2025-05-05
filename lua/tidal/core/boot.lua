@@ -6,12 +6,13 @@ local M = {}
 
 ---Start a tidal repl
 ---@param opts TidalProcConfig
-function M.tidal(opts)
+---@param split? 'v' | 'h' | nil
+function M.tidal(opts, split)
   if not opts.enabled then
     return
   end
 
-  state.ghci = Ghci.new({
+  state.ghci = Ghci:new({
     name = "tidal",
     cmd = opts.cmd,
     args = vim.list_extend({
@@ -21,20 +22,20 @@ function M.tidal(opts)
     on_exit = function(_code, _signal)
       state.ghci = nil
     end,
-    window = {
-      split = "v",
-    },
+  }):start({
+    split = split or "v",
   })
 end
 
 ---Start an sclang instance
 ---@param opts TidalProcConfig
-function M.sclang(opts)
+---@param split? 'v' | 'h' | nil
+function M.sclang(opts, split)
   if not opts.enabled then
     return
   end
 
-  state.sclang = Sclang.new({
+  state.sclang = Sclang:new({
     name = "sclang",
     cmd = opts.cmd,
     args = vim.list_extend({
@@ -47,6 +48,8 @@ function M.sclang(opts)
     window = {
       split = "h",
     },
+  }):start({
+    split = split or "h",
   })
 
   -- load the boot file

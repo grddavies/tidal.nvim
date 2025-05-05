@@ -18,12 +18,11 @@ function M.launch_tidal(args)
     return
   end
   if args.tidal.enabled then
-    -- TODO: (config) Configurable split
-    boot.tidal(args.tidal)
+    boot.tidal(args.tidal, args.split)
   end
   if args.sclang.enabled then
-    -- TODO: (config) Configurable split
-    boot.sclang(args.sclang)
+    -- invert the split option if tidal is opened already
+    boot.sclang(args.sclang, args.split == "v" and args.tidal.enabled and "h" or "v")
   end
   vim.api.nvim_set_current_win(current_win)
   state.launched = true

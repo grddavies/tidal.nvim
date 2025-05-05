@@ -1,6 +1,5 @@
 ---@class Buffer
 ---@field bufnr? integer
-
 local Buffer = {}
 Buffer.__index = Buffer
 
@@ -8,6 +7,7 @@ Buffer.__index = Buffer
 ---@field name? string
 ---@field listed? boolean
 ---@field scratch? boolean
+
 function Buffer.new(opts)
   local self = setmetatable({}, Buffer)
   opts = vim.tbl_extend("force", {

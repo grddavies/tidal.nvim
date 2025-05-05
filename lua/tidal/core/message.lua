@@ -1,5 +1,3 @@
-local notify = require("tidal.util.notify")
-local select = require("tidal.util.select")
 local state = require("tidal.core.state")
 
 local M = {}
