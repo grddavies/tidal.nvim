@@ -67,7 +67,7 @@ end
 
 -- Send 'd{count} silence' to tidal interpreter to silence a pattern d1-d16
 function M.send_silence()
-  message.tidal.send(string.format("d%d silence", vim.v.count1))
+  message.tidal.send_line(string.format("d%d silence", vim.v.count1))
 end
 
 --- Send multiline to the interpreter for the current filetype
