@@ -1,3 +1,4 @@
+local notify = require("tidal.util.notify")
 local util = require("tidal.util")
 
 local M = {}
@@ -117,31 +118,60 @@ function M.get_block()
   }
 end
 
-local expression_nodes = {
-  "top_splice",
-  "exp",
-  "bind",
-  "function",
+---@class LangSpec
+---@field expression string[]
+---@field skip? string[] Node types to skip selection
+
+--- @type table<string, LangSpec>
+local node_types = {
+  haskell = {
+    expression = {
+      "top_splice",
+      "exp",
+      "bind",
+      "function",
+    },
+    skip = {
+      "haskell",
+      "declarations",
+    },
+  },
+  supercollider = {
+    expression = {
+      "code_block",
+    },
+  },
 }
 
 --- Get top level TS node at current position
 ---@return TextRange | nil
 function M.get_node()
-  local node = vim.treesitter.get_node()
-  local root
-  if node then
-    root = node:tree():root()
+  local ft = vim.api.nvim_get_option_value("filetype", { buf = 0 })
+  local lang = vim.treesitter.language.get_lang(ft)
+
+  if lang == nil then
+    notify.error("No treesitter parser for '" .. ft .. "'")
+    return
   end
+
+  local nodes = node_types[lang]
+  local node = vim.treesitter.get_node()
+  if not node or vim.tbl_contains(nodes.skip or {}, node:type()) then
+    return
+  end
+
+  local root
+  root = node:tree():root()
+
   if not root then
     return
   end
   local parent
-  if node then
-    parent = node:parent()
-  end
+  parent = node:parent()
+  local break_nodes = nodes.expression or {}
   while node ~= nil and not node:equal(root) do
     local node_t = node:type()
-    if vim.list_contains(expression_nodes, node_t) then
+    if vim.list_contains(break_nodes, node_t) then
       break
     end
     node = parent
@@ -149,11 +179,20 @@ function M.get_node()
       parent = node:parent()
     end
   end
-  if not node then
-    return
-  end
+  assert(node, "node cannot be nil")
+
   local start_row, start_col, finish_row, finish_col = vim.treesitter.get_node_range(node)
-  local lines = vim.api.nvim_buf_get_text(0, start_row, start_col, finish_row, finish_col, {})
+  local bufnr = 0
+
+  local line_count = vim.api.nvim_buf_line_count(bufnr)
+
+  if finish_row >= line_count then
+    finish_row = line_count - 1
+    local last_line = vim.api.nvim_buf_get_lines(bufnr, finish_row, finish_row + 1, false)[1] or ""
+    finish_col = #last_line
+  end
+
+  local lines = vim.api.nvim_buf_get_text(bufnr, start_row, start_col, finish_row, finish_col, {})
   return {
     start = { start_row, start_col },
     finish = { finish_row, finish_col },
