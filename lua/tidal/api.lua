@@ -92,7 +92,7 @@ function M.send_line()
   end
 end
 
---- Send the last visual selection to the tidal interpreter
+--- Send the last visual selection to the interpreter for the current filetype
 function M.send_visual()
   local visual = select.get_visual()
   if visual then
@@ -104,7 +104,7 @@ function M.send_visual()
   end
 end
 
---- Send the current block to tidal interpreter
+--- Send the current block to the interpreter for the current filetype
 function M.send_block()
   if util.is_empty(vim.api.nvim_get_current_line()) then
     return
@@ -117,7 +117,7 @@ function M.send_block()
   end
 end
 
---- Send current TS block to tidal interpreter
+--- Send current expression node to the interpreter for the current filetype
 function M.send_node()
   local block = select.get_node()
   if block then
