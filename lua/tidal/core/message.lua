@@ -2,6 +2,7 @@ local state = require("tidal.core.state")
 
 local M = {}
 
+---@class message.TidalRepl
 M.tidal = {}
 
 --- Send text to the tidal interpreter
@@ -47,11 +48,12 @@ end
 ---   return "g@"
 --- end
 
-M.scd = {}
+---@class message.SclangRepl
+M.sclang = {}
 
 --- Send text to the supercollider interpreter
 ---@param text string
-function M.scd.send(text)
+function M.sclang.send(text)
   if not state.sclang then
     return
   end
@@ -60,7 +62,7 @@ end
 
 --- Send a line of text to the tidal interpreter
 ---@param text string
-function M.scd.send_line(text)
+function M.sclang.send_line(text)
   if not state.sclang then
     return
   end
@@ -69,7 +71,7 @@ end
 
 --- Send multiline text to the scd interpreter
 ---@param lines string[]
-function M.scd.send_multiline(lines)
+function M.sclang.send_multiline(lines)
   if not state.sclang then
     return
   end

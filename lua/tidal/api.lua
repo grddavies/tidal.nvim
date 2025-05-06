@@ -44,10 +44,11 @@ function M.exit_tidal()
   state.launched = false
 end
 
+---@return message.TidalRepl | message.SclangRepl
 local function ft_to_repl()
   local ft = vim.api.nvim_get_option_value("filetype", { buf = 0 })
   if ft == "supercollider" then
-    return message.scd
+    return message.sclang
   end
   if ft == "haskell" or ft == "tidal" then
     return message.tidal
@@ -75,7 +76,7 @@ end
 function M.send_multiline(lines)
   local repl = ft_to_repl()
   if repl then
-    repl.send_multilined(lines)
+    repl.send_multiline(lines)
   end
 end
 
