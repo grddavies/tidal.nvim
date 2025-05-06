@@ -4,15 +4,15 @@ tidal.nvim is (another) Neovim plugin for livecoding with [TidalCycles](https://
 
 ## Features
 
-- User commands to start/stop ghci and (optionally) SuperCollider processes in
+- User commands to start/stop Tidal and (optionally) SuperCollider processes in
   Neovim's built in terminal (see [boot](#boot))
 
-- Send commands to the tidal interpreter using built-in [keymaps](#keymaps)
+- Send commands to the Tidal and SuperCollider using built-in [keymaps](#keymaps)
 
 - Write your own keymaps and functions using lua functions exported as part of
   the tidal.nvim [api](#api)
 
-- Apply haskell syntax highlighting to .tidal files
+- Apply Haskell syntax highlighting to `.tidal` files
 
 ## Installation
 
@@ -21,12 +21,17 @@ Install the plugin with your preferred package manager:
 eg [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
-
-return { 'grddavies/tidal.nvim',
-opts = {
+return {
+  "grddavies/tidal.nvim",
+  opts = {
     -- Your configuration here
     -- See configuration section for defaults
-  }
+  },
+  -- Recommended: Install TreeSitter parsers for Haskell and SuperCollider
+  {
+    "nvim-treesitter/nvim-treesitter",
+    opts = { ensure_installed = { "haskell", "supercollider" } },
+  },
 }
 ```
 
@@ -83,17 +88,17 @@ opts = {
 
 ### Boot
 
-`tidal.nvim` provides a pair of `Ex` commands,
-`:TidalLaunch` and `:TidalQuit`,
-which start and stop TidalCycles processes.
-By default, only a session of `ghci` running the `BootTidal.hs` script provided
-by this plugin is run.
+`tidal.nvim` provides a pair of `Ex` commands, `:TidalLaunch` and `:TidalQuit`,
+which start and stop TidalCycles processes. By default, only a session of
+`ghci` running the `BootTidal.hs` script provided by this plugin is run.
 
-If `boot.sclang.enabled` is `true`, then a session of `sclang` is run.
-Please ensure that the command `sclang` correctly starts an instance of
-SuperCollider when executed in the terminal.
-By default on macOS, this appears to require something like the following
-shell script saved as `sclang` someplace in your path.
+If `boot.sclang.enabled` is `true`, then a session of `sclang` is run. Please
+ensure that the command `sclang` correctly starts an instance of SuperCollider
+when executed in the terminal.
+
+By default on macOS, this may require something like the following shell script
+available as `sclang` in your path. Alternate commands/paths can be configured
+in `boot.sclang`
 
 ```sh
 #!/bin/sh
@@ -103,8 +108,9 @@ cd /Applications/SuperCollider.app/Contents/MacOS
 
 ### Keymaps
 
-`tidal.nvim` provides five configurable keymaps in `.tidal` files,
-which are used to send chunks of TidalCycles code from the file to the Tidal interpreter:
+`tidal.nvim` provides five configurable keymaps in `.tidal` and `.scd` files,
+which are used to send chunks of TidalCycles code from the file to the Tidal
+and SuperCollider interpreters:
 
 - `send_line` sends the current line
 
@@ -117,7 +123,7 @@ which are used to send chunks of TidalCycles code from the file to the Tidal int
 - `send_silence` accepts a count (see :h count) sends `d<count> silence` to
   tidal, silencing the pattern. By default, with no count, d1 is silenced.
 
-- `hush` sends "hush"
+- `hush` sends "hush" to the tidal interpreter, which silences all patterns.
 
 ### API
 
@@ -146,11 +152,15 @@ see [api.lua](lua/tidal/api.lua) for the full list
 
 ## Requirements
 
+### OS
+
+This plugin has been tested on macOS and Linux.
+
 ### TidalCycles
 
 See the [tidal website for full details](https://tidalcycles.org/docs/getting-started/linux_install)
 
-- ghc installation with tidal installed
+- `ghc` installation with Tidal installed
 
 - SuperCollider with SuperDirt
 
@@ -158,20 +168,21 @@ See the [tidal website for full details](https://tidalcycles.org/docs/getting-st
 
 To use the `send_node` mapping, which is based on
 [treesitter](https://github.com/nvim-treesitter/nvim-treesitter), you must have
-the treesitter parser for `haskell` installed.
+the treesitter parser for `haskell` (and, optionally also `supercollider`)
+installed.
 
 ## Contributing
 
-Contributions to the Neovim Tidalcycles Plugin are welcome! If you have ideas,
-bug fixes, or enhancements, please submit them as issues or pull requests
+Contributions to this plugin are welcome! If you have ideas, bug fixes, or
+enhancements, please submit them as issues or pull requests
 
 ## Related projects
 
-- [ryleelyman/tidal.nvim](https://github.com/ryleelyman/tidal.nvim) - Original
+- [robbielyman/tidal.nvim](https://github.com/robbielyman/tidal.nvim) - Original
   fork of this project
 
-- [vim.tidal](https://github.com/tidalcycles/vim-tidal) - Vim plugin
-  for tidalcycles
+- [vim.tidal](https://github.com/tidalcycles/vim-tidal) - Vim plugin for
+  tidalcycles.
 
 - [vscode-tidalcycles](https://github.com/tidalcycles/vscode-tidalcycles) -
   VSCode plugin for tidalcycles
