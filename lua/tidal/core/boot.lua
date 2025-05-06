@@ -1,70 +1,60 @@
+local Ghci = require("tidal.util.repl.ghci")
+local Sclang = require("tidal.util.repl.sclang")
 local state = require("tidal.core.state")
 
 local M = {}
 
 ---Start a tidal repl
----@param args TidalProcConfig
-function M.tidal(args)
-  if not args.enabled then
+---@param opts TidalProcConfig
+---@param split? 'v' | 'h' | nil
+function M.tidal(opts, split)
+  if not opts.enabled then
     return
   end
-  if state.ghci.buf then
-    local ok = pcall(vim.api.nvim_set_current_buf, state.ghci.buf)
-    if not ok then
-      state.ghci.buf = nil
-      M.tidal(args)
-      return
-    end
-  else
-    state.ghci.buf = vim.api.nvim_create_buf(false, false)
-    M.tidal(args)
-    return
-  end
-  state.ghci.proc = vim.fn.jobstart(
-    args.cmd .. " -XOverloadedStrings " .. table.concat(args.args, " ") .. " -ghci-script=" .. args.file,
-    {
-      term = true,
-      on_exit = function()
-        if state.ghci.buf ~= nil and #vim.fn.win_findbuf(state.ghci.buf) > 0 then
-          vim.api.nvim_win_close(vim.fn.win_findbuf(state.ghci.buf)[1], true)
-        end
-        vim.api.nvim_buf_delete(state.ghci.buf, {})
-        state.ghci.buf = nil
-        state.ghci.proc = nil
-      end,
-    }
-  )
+
+  state.ghci = Ghci:new({
+    name = "tidal",
+    cmd = opts.cmd,
+    args = vim.list_extend({
+      "-XOverloadedStrings",
+      "-ghci-script=" .. vim.fn.expand(opts.file),
+    }, opts.args or {}),
+    on_exit = function(_code, _signal)
+      state.ghci = nil
+    end,
+  }):start({
+    split = split or "v",
+  })
 end
 
 ---Start an sclang instance
----@param args TidalProcConfig
-function M.sclang(args)
-  if not args.enabled then
-    return
-  end
-  if state.sclang.buf then
-    local ok = pcall(vim.api.nvim_set_current_buf, state.sclang.buf)
-    if not ok then
-      state.sclang.buf = nil
-      M.sclang(args)
-    end
-  else
-    state.sclang.buf = vim.api.nvim_create_buf(false, false)
-    M.sclang(args)
+---@param opts TidalProcConfig
+---@param split? 'v' | 'h' | nil
+function M.sclang(opts, split)
+  if not opts.enabled then
     return
   end
 
-  state.sclang.proc = vim.fn.jobstart(args.cmd .. " " .. args.file, {
-    term = true,
-    on_exit = function()
-      if state.sclang.buf ~= nil and #vim.fn.win_findbuf(state.sclang.buf) > 0 then
-        vim.api.nvim_win_close(vim.fn.win_findbuf(state.sclang.buf)[1], true)
-      end
-      vim.api.nvim_buf_delete(state.sclang.buf, {})
-      state.sclang.buf = nil
-      state.sclang.proc = nil
+  state.sclang = Sclang:new({
+    name = "sclang",
+    cmd = opts.cmd,
+    args = vim.list_extend({
+      "-i",
+      "scnvim",
+    }, opts.args or {}),
+    on_exit = function(_code, _signal)
+      state.sclang = nil
     end,
+    window = {
+      split = "h",
+    },
+  }):start({
+    split = split or "h",
   })
+
+  -- load the boot file
+  local file = vim.fn.expand(opts.file)
+  state.sclang:send_line('"' .. file .. '".load;')
 end
 
 return M
